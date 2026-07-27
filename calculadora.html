@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calculadora de Depreciación Ross-Heidecke</title>
+  <title>Calculadora Ross-Heidecke Corporativa</title>
   <style>
     :root {
       --navy: #0f2a4a;
@@ -15,82 +15,93 @@
       --text: #23374d;
       --danger: #c0392b;
       --success: #2e7d32;
-      --shadow: 0 16px 40px rgba(15, 42, 74, 0.12);
+      --shadow: 0 18px 44px rgba(15, 42, 74, 0.12);
     }
 
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: "Segoe UI", Roboto, Arial, sans-serif;
-      background: linear-gradient(135deg, var(--gray) 0%, #f9fbfd 100%);
+      background: linear-gradient(135deg, #f5f8fc 0%, #eef4fb 100%);
       color: var(--text);
       min-height: 100vh;
       padding: 24px;
     }
 
-    .container {
-      max-width: 980px;
+    .shell {
+      max-width: 1220px;
       margin: 0 auto;
       background: #ffffff;
-      border-radius: 24px;
+      border-radius: 28px;
       box-shadow: var(--shadow);
       overflow: hidden;
-      border: 1px solid rgba(15, 42, 74, 0.07);
+      border: 1px solid rgba(15, 42, 74, 0.06);
     }
 
     .hero {
       background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
       color: white;
-      padding: 32px 32px 24px;
+      padding: 32px 32px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
     }
 
     .hero h1 {
       margin: 0 0 8px;
-      font-size: clamp(1.6rem, 2.3vw, 2.2rem);
+      font-size: clamp(1.6rem, 2.4vw, 2.3rem);
       font-weight: 700;
     }
 
     .hero p {
       margin: 0;
       opacity: 0.9;
-      line-height: 1.6;
+      line-height: 1.65;
       max-width: 760px;
+    }
+
+    .badge {
+      background: rgba(255,255,255,0.16);
+      border: 1px solid rgba(255,255,255,0.24);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 0.92rem;
+      white-space: nowrap;
+      font-weight: 600;
     }
 
     .content {
       display: grid;
-      grid-template-columns: 1.05fr 0.95fr;
+      grid-template-columns: 0.95fr 1.05fr;
       gap: 24px;
       padding: 28px;
     }
 
-    .card {
+    .panel {
       background: #fff;
       border: 1px solid var(--gray-2);
-      border-radius: 18px;
+      border-radius: 22px;
       padding: 24px;
     }
 
-    .card h2 {
-      margin-top: 0;
-      margin-bottom: 18px;
-      font-size: 1.1rem;
+    .panel-title {
+      margin: 0 0 18px;
+      font-size: 1.08rem;
       color: var(--navy);
-    }
-
-    .form-grid {
-      display: grid;
-      gap: 16px;
+      font-weight: 700;
     }
 
     .field {
       display: flex;
       flex-direction: column;
       gap: 8px;
+      margin-bottom: 15px;
     }
 
     label {
-      font-weight: 600;
+      font-weight: 700;
       color: var(--navy);
       font-size: 0.95rem;
     }
@@ -110,29 +121,30 @@
     input:focus, select:focus {
       border-color: var(--blue);
       box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.16);
-      background: #ffffff;
+      background: white;
     }
 
-    .field small {
-      color: #66768a;
-      font-size: 0.85rem;
+    .hint {
+      color: #708096;
+      font-size: 0.86rem;
+      line-height: 1.45;
     }
 
     .actions {
       display: flex;
       gap: 12px;
-      margin-top: 10px;
       flex-wrap: wrap;
+      margin-top: 6px;
     }
 
     button {
       border: none;
       border-radius: 999px;
       padding: 12px 18px;
-      font-size: 0.98rem;
+      font-size: 0.95rem;
       font-weight: 700;
       cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
     }
 
     button:hover { transform: translateY(-1px); }
@@ -140,7 +152,7 @@
     .btn-primary {
       background: linear-gradient(135deg, var(--blue), var(--navy));
       color: white;
-      box-shadow: 0 10px 22px rgba(43, 108, 176, 0.24);
+      box-shadow: 0 10px 22px rgba(43, 108, 176, 0.22);
     }
 
     .btn-secondary {
@@ -149,8 +161,14 @@
       border: 1px solid var(--gray-2);
     }
 
+    .btn-accent {
+      background: var(--blue-soft);
+      color: var(--navy);
+      border: 1px solid #d2e3f5;
+    }
+
     .error {
-      margin-top: 12px;
+      margin-top: 14px;
       padding: 12px 14px;
       border-radius: 12px;
       background: #fff3f2;
@@ -158,135 +176,278 @@
       border: 1px solid #f3b8b1;
       display: none;
       font-size: 0.95rem;
+      line-height: 1.5;
     }
 
-    .results {
+    .results-wrap {
       display: none;
-      margin-top: 18px;
-      background: linear-gradient(135deg, var(--blue-soft), #f9fcff);
-      border: 1px solid #d8e7f7;
-      border-radius: 16px;
-      padding: 20px;
     }
 
-    .results h3 {
-      margin-top: 0;
-      margin-bottom: 14px;
-      color: var(--navy);
-      font-size: 1.05rem;
-    }
-
-    .result-grid {
+    .kpi-grid {
       display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
+      margin-bottom: 16px;
     }
 
-    .result-item {
+    .kpi {
+      padding: 14px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #f7fbff 0%, #eef5fc 100%);
+      border: 1px solid #dfeff9;
+    }
+
+    .kpi span {
+      display: block;
+      font-size: 0.82rem;
+      color: #5e7188;
+      margin-bottom: 6px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .kpi strong {
+      font-size: 1.05rem;
+      color: var(--navy);
+      word-break: break-word;
+    }
+
+    .chart-card {
+      background: linear-gradient(135deg, #f8fbff 0%, #f3f7fb 100%);
+      border: 1px solid #dce9f7;
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .chart-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 10px;
+    }
+
+    .chart-svg {
+      width: 100%;
+      height: 220px;
+      display: block;
+    }
+
+    .legend {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
-      background: white;
-      border-radius: 12px;
-      border: 1px solid #e7eef6;
-    }
-
-    .result-item strong { color: var(--navy); }
-
-    .formula {
-      margin-top: 14px;
-      padding: 12px 14px;
-      background: rgba(255,255,255,0.8);
-      border-radius: 12px;
-      color: var(--text);
-      font-size: 0.94rem;
-      line-height: 1.6;
-      border: 1px solid #e2ebf7;
-    }
-
-    .note {
-      margin-top: 14px;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 8px;
       font-size: 0.9rem;
-      color: #5d6b7a;
-      line-height: 1.55;
+      color: #5d6c7d;
     }
 
-    @media (max-width: 820px) {
+    .dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    .dot-ross { background: var(--blue); }
+    .dot-heidecke { background: var(--success); }
+    .dot-total { background: var(--navy); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 4px;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 10px 8px;
+      text-align: left;
+      border-bottom: 1px solid #e8eef5;
+    }
+
+    th {
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.86rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .formula-box {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #fbfdff;
+      border: 1px solid #e2ebf7;
+      color: var(--text);
+      font-size: 0.93rem;
+      line-height: 1.6;
+    }
+
+    .print-note {
+      margin-top: 12px;
+      color: #5d6c7d;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 900px) {
       .content { grid-template-columns: 1fr; }
-      .hero { padding: 24px 20px 20px; }
-      .content { padding: 20px; }
-      .card { padding: 20px; }
+      .hero { flex-direction: column; }
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 12px; }
+      .hero, .panel { padding: 18px; }
+      .kpi-grid { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+
+      .shell {
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+      }
+
+      .hero, .actions, .btn-accent, .btn-secondary, .btn-primary, .print-note {
+        display: none !important;
+      }
+
+      .content {
+        display: block;
+        padding: 0;
+      }
+
+      .panel {
+        border: 1px solid #d9e3ee;
+        border-radius: 0;
+        box-shadow: none;
+        margin-bottom: 12px;
+        page-break-inside: avoid;
+      }
     }
   </style>
 </head>
 <body>
-  <main class="container">
-    <section class="hero">
-      <h1>Calculadora de Depreciación Profesional</h1>
-      <p>Evaluación ejecutiva del valor actual neto de un inmueble bajo el método Ross-Heidecke, con ajuste por grado de conservación según la tabla internacional.</p>
-    </section>
+  <main class="shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Valoración inmobiliaria ejecutiva</p>
+        <h1>Calculadora Ross-Heidecke Corporativa</h1>
+        <p>Analiza el estado de depreciación de un inmueble con un enfoque profesional, visual y preparado para reportes ejecutivos.</p>
+      </div>
+      <div class="badge">Client-side • sin APIs</div>
+    </header>
 
     <section class="content">
-      <div class="card">
-        <h2>Datos del inmueble</h2>
+      <div class="panel">
+        <h2 class="panel-title">Parámetros de valoración</h2>
         <form id="depreciationForm" novalidate>
-          <div class="form-grid">
-            <div class="field">
-              <label for="vrn">Valor de Reproducción Nuevo (VRN)</label>
-              <input id="vrn" name="vrn" type="number" min="0.01" step="0.01" placeholder="Ej. 1250500" required />
-              <small>Ingrese un valor positivo en pesos.</small>
-            </div>
+          <div class="field">
+            <label for="vrn">Valor de Reproducción Nuevo (VRN)</label>
+            <input id="vrn" name="vrn" type="number" min="0.01" step="0.01" placeholder="Ej. 1,250,500" required />
+            <div class="hint">Ingrese un valor positivo en pesos.</div>
+          </div>
 
-            <div class="field">
-              <label for="edad">Edad actual del inmueble (e)</label>
-              <input id="edad" name="edad" type="number" min="0" step="1" placeholder="Ej. 12" required />
-              <small>En años; debe ser mayor o igual a 0.</small>
-            </div>
+          <div class="field">
+            <label for="edad">Edad actual del inmueble (e)</label>
+            <input id="edad" name="edad" type="number" min="0" step="1" placeholder="Ej. 12" required />
+            <div class="hint">En años; debe ser mayor o igual a 0.</div>
+          </div>
 
-            <div class="field">
-              <label for="vidaUtil">Vida útil total estimada (V)</label>
-              <input id="vidaUtil" name="vidaUtil" type="number" min="1" step="1" placeholder="Ej. 40" required />
-              <small>Debe ser estrictamente mayor que la edad actual.</small>
-            </div>
+          <div class="field">
+            <label for="vidaUtil">Vida útil total estimada (V)</label>
+            <input id="vidaUtil" name="vidaUtil" type="number" min="1" step="1" placeholder="Ej. 40" required />
+            <div class="hint">Debe ser estrictamente mayor que la edad actual.</div>
+          </div>
 
-            <div class="field">
-              <label for="conservacion">Estado de conservación</label>
-              <select id="conservacion" name="conservacion">
-                <option value="0">Grado 1 - Nuevo / Excelente estado</option>
-                <option value="0.03">Grado 2 - Regular / Conservación normal</option>
-                <option value="0.08">Grado 3 - Reparaciones sencillas / Mantenimiento menor</option>
-                <option value="0.18">Grado 4 - Reparaciones importantes / Desatendido</option>
-                <option value="0.5">Grado 5 - Demolición / Inservible</option>
-              </select>
-              <small>Seleccione el coeficiente de Heidecke que mejor represente el estado.</small>
-            </div>
+          <div class="field">
+            <label for="conservacion">Estado de conservación</label>
+            <select id="conservacion" name="conservacion">
+              <option value="0">Grado 1 - Nuevo / Excelente estado</option>
+              <option value="0.03">Grado 2 - Regular / Conservación normal</option>
+              <option value="0.08">Grado 3 - Reparaciones sencillas / Mantenimiento menor</option>
+              <option value="0.18">Grado 4 - Reparaciones importantes / Desatendido</option>
+              <option value="0.5">Grado 5 - Demolición / Inservible</option>
+            </select>
+            <div class="hint">Seleccione el coeficiente de Heidecke que mejor represente la condición del inmueble.</div>
           </div>
 
           <div class="actions">
             <button type="submit" class="btn-primary">Calcular</button>
             <button type="button" id="resetBtn" class="btn-secondary">Limpiar</button>
+            <button type="button" id="exportBtn" class="btn-accent">Exportar a PDF</button>
           </div>
 
           <div id="errorMessage" class="error" role="alert"></div>
         </form>
       </div>
 
-      <div class="card">
-        <h2>Resultado de valoración</h2>
-        <div id="results" class="results">
-          <h3>Depreciación total estimada</h3>
-          <div class="result-grid">
-            <div class="result-item"><span>Factor Ross (R)</span><strong id="factorRoss">—</strong></div>
-            <div class="result-item"><span>Coeficiente Heidecke (p)</span><strong id="coefHeidecke">—</strong></div>
-            <div class="result-item"><span>Factor Total Ross-Heidecke (F_total)</span><strong id="factorTotal">—</strong></div>
-            <div class="result-item"><span>Depreciación acumulada</span><strong id="depreciacion">—</strong></div>
-            <div class="result-item"><span>Valor actual neto depreciado</span><strong id="valorActual">—</strong></div>
+      <div class="panel">
+        <h2 class="panel-title">Resumen ejecutivo y tabla de resultados</h2>
+        <div id="resultsWrap" class="results-wrap">
+          <div class="kpi-grid">
+            <div class="kpi">
+              <span>Depreciación acumulada</span>
+              <strong id="kpiDep">—</strong>
+            </div>
+            <div class="kpi">
+              <span>Valor actual neto</span>
+              <strong id="kpiValor">—</strong>
+            </div>
           </div>
 
-          <div class="formula" id="formulaText"></div>
-          <p class="note">Todos los cálculos se ejecutan localmente en tu navegador sin depender de servicios externos.</p>
+          <div class="chart-card">
+            <div class="chart-title">Composición del factor total</div>
+            <svg class="chart-svg" viewBox="0 0 320 220" id="chartSvg" aria-label="Gráfico comparativo de factores de depreciación">
+              <rect x="20" y="20" width="280" height="180" rx="16" fill="#ffffff" stroke="#dce8f5"></rect>
+              <line x1="40" y1="180" x2="280" y2="180" stroke="#cfdbe8"></line>
+              <line x1="40" y1="140" x2="280" y2="140" stroke="#eef3f7"></line>
+              <line x1="40" y1="100" x2="280" y2="100" stroke="#eef3f7"></line>
+              <line x1="40" y1="60" x2="280" y2="60" stroke="#eef3f7"></line>
+              <rect id="barRoss" x="60" y="160" width="48" height="20" rx="8" fill="#2b6cb0"></rect>
+              <rect id="barHeidecke" x="136" y="160" width="48" height="20" rx="8" fill="#2e7d32"></rect>
+              <rect id="barTotal" x="212" y="160" width="48" height="20" rx="8" fill="#0f2a4a"></rect>
+              <text id="labelRoss" x="84" y="202" text-anchor="middle" font-size="12" fill="#5d6c7d">R</text>
+              <text id="labelHeidecke" x="160" y="202" text-anchor="middle" font-size="12" fill="#5d6c7d">p</text>
+              <text id="labelTotal" x="236" y="202" text-anchor="middle" font-size="12" fill="#5d6c7d">F_total</text>
+            </svg>
+            <div class="legend">
+              <div><span class="dot dot-ross"></span> Factor Ross (R)</div>
+              <div><span class="dot dot-heidecke"></span> Coeficiente Heidecke (p)</div>
+              <div><span class="dot dot-total"></span> Factor total</div>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Concepto</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Factor Ross (R)</td><td id="rowRoss">—</td></tr>
+              <tr><td>Coeficiente Heidecke (p)</td><td id="rowHeidecke">—</td></tr>
+              <tr><td>Factor total Ross-Heidecke (F_total)</td><td id="rowTotal">—</td></tr>
+              <tr><td>Depreciación acumulada</td><td id="rowDep">—</td></tr>
+              <tr><td>Valor actual neto depreciado</td><td id="rowValor">—</td></tr>
+            </tbody>
+          </table>
+
+          <div class="formula-box" id="formulaText"></div>
         </div>
+
+        <div class="print-note">El botón de exportación prepara la vista para impresión y PDF. Los cálculos se ejecutan localmente en tu navegador.</div>
       </div>
     </section>
   </main>
@@ -294,8 +455,9 @@
   <script>
     const form = document.getElementById('depreciationForm');
     const errorMessage = document.getElementById('errorMessage');
-    const results = document.getElementById('results');
+    const resultsWrap = document.getElementById('resultsWrap');
     const resetBtn = document.getElementById('resetBtn');
+    const exportBtn = document.getElementById('exportBtn');
 
     const currencyFormatter = new Intl.NumberFormat('es-MX', {
       style: 'currency',
@@ -311,7 +473,7 @@
     function showError(message) {
       errorMessage.textContent = message;
       errorMessage.style.display = 'block';
-      results.style.display = 'none';
+      resultsWrap.style.display = 'none';
     }
 
     function clearError() {
@@ -322,7 +484,56 @@
     function resetForm() {
       form.reset();
       clearError();
-      results.style.display = 'none';
+      resultsWrap.style.display = 'none';
+    }
+
+    function drawChart(R, p, F_total) {
+      const maxValue = Math.max(1, R, p, F_total);
+      const scale = 100 / maxValue;
+      const bars = [
+        { id: 'barRoss', value: R },
+        { id: 'barHeidecke', value: p },
+        { id: 'barTotal', value: F_total }
+      ];
+
+      bars.forEach((bar) => {
+        const element = document.getElementById(bar.id);
+        const height = Math.max(18, Math.min(140, bar.value * scale));
+        const y = 160 - height;
+        element.setAttribute('y', String(y));
+        element.setAttribute('height', String(height));
+      });
+
+      const labels = [
+        ['labelRoss', R],
+        ['labelHeidecke', p],
+        ['labelTotal', F_total]
+      ];
+
+      labels.forEach(([id, value]) => {
+        const label = document.getElementById(id);
+        label.textContent = `${id === 'labelRoss' ? 'R' : id === 'labelHeidecke' ? 'p' : 'F_total'} (${formatDecimal(value)})`;
+      });
+    }
+
+    function renderResults(data) {
+      const { R, p, F_total, depreciacionAcumulada, valorActualNeto } = data;
+      document.getElementById('kpiDep').textContent = currencyFormatter.format(depreciacionAcumulada);
+      document.getElementById('kpiValor').textContent = currencyFormatter.format(valorActualNeto);
+      document.getElementById('rowRoss').textContent = formatDecimal(R);
+      document.getElementById('rowHeidecke').textContent = formatDecimal(p);
+      document.getElementById('rowTotal').textContent = formatDecimal(F_total);
+      document.getElementById('rowDep').textContent = currencyFormatter.format(depreciacionAcumulada);
+      document.getElementById('rowValor').textContent = currencyFormatter.format(valorActualNeto);
+      document.getElementById('formulaText').innerHTML = `
+        <strong>Fórmula aplicada:</strong><br>
+        R = 0.5 × ((e / V) + (e² / V²)) = ${formatDecimal(R)}<br>
+        F_total = R + (p × (1 - R)) = ${formatDecimal(F_total)}<br>
+        Depreciación acumulada = VRN × F_total = ${currencyFormatter.format(depreciacionAcumulada)}<br>
+        Valor actual neto = VRN × (1 - F_total) = ${currencyFormatter.format(valorActualNeto)}
+      `;
+      drawChart(R, p, F_total);
+      resultsWrap.style.display = 'block';
     }
 
     form.addEventListener('submit', function (event) {
@@ -364,24 +575,17 @@
       const depreciacionAcumulada = vrn * F_total;
       const valorActualNeto = vrn * (1 - F_total);
 
-      document.getElementById('factorRoss').textContent = formatDecimal(R);
-      document.getElementById('coefHeidecke').textContent = formatDecimal(p);
-      document.getElementById('factorTotal').textContent = formatDecimal(F_total);
-      document.getElementById('depreciacion').textContent = currencyFormatter.format(depreciacionAcumulada);
-      document.getElementById('valorActual').textContent = currencyFormatter.format(valorActualNeto);
-
-      document.getElementById('formulaText').innerHTML = `
-        <strong>Fórmula aplicada:</strong><br>
-        R = 0.5 × ((e / V) + (e² / V²)) = ${formatDecimal(R)}<br>
-        F_total = R + (p × (1 - R)) = ${formatDecimal(F_total)}<br>
-        Depreciación acumulada = VRN × F_total = ${currencyFormatter.format(depreciacionAcumulada)}<br>
-        Valor actual neto = VRN × (1 - F_total) = ${currencyFormatter.format(valorActualNeto)}
-      `;
-
-      results.style.display = 'block';
+      renderResults({ R, p, F_total, depreciacionAcumulada, valorActualNeto });
     });
 
     resetBtn.addEventListener('click', resetForm);
+    exportBtn.addEventListener('click', function () {
+      if (resultsWrap.style.display !== 'block') {
+        showError('Primero calcula un resultado para preparar el reporte.');
+        return;
+      }
+      window.print();
+    });
   </script>
 </body>
 </html>
