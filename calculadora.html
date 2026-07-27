@@ -1,1 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora de Depreciación Ross-Heidecke</title>
+  <style>
+    :root {
+      --navy: #0f2a4a;
+      --navy-2: #183b63;
+      --blue: #2b6cb0;
+      --blue-soft: #eaf3fb;
+      --gray: #f4f6f8;
+      --gray-2: #dfe4e8;
+      --text: #23374d;
+      --danger: #c0392b;
+      --success: #2e7d32;
+      --shadow: 0 16px 40px rgba(15, 42, 74, 0.12);
+    }
 
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg, var(--gray) 0%, #f9fbfd 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border: 1px solid rgba(15, 42, 74, 0.07);
+    }
+
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+      color: white;
+      padding: 32px 32px 24px;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.6rem, 2.3vw, 2.2rem);
+      font-weight: 700;
+    }
+
+    .hero p {
+      margin: 0;
+      opacity: 0.9;
+      line-height: 1.6;
+      max-width: 760px;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 24px;
+      padding: 28px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid var(--gray-2);
+      border-radius: 18px;
+      padding: 24px;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 18px;
+      font-size: 1.1rem;
+      color: var(--navy);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-weight: 600;
+      color: var(--navy);
+      font-size: 0.95rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--gray-2);
+      background: var(--gray);
+      font-size: 1rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.16);
+      background: #ffffff;
+    }
+
+    .field small {
+      color: #66768a;
+      font-size: 0.85rem;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-size: 0.98rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--blue), var(--navy));
+      color: white;
+      box-shadow: 0 10px 22px rgba(43, 108, 176, 0.24);
+    }
+
+    .btn-secondary {
+      background: var(--gray);
+      color: var(--navy);
+      border: 1px solid var(--gray-2);
+    }
+
+    .error {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #fff3f2;
+      color: var(--danger);
+      border: 1px solid #f3b8b1;
+      display: none;
+      font-size: 0.95rem;
+    }
+
+    .results {
+      display: none;
+      margin-top: 18px;
+      background: linear-gradient(135deg, var(--blue-soft), #f9fcff);
+      border: 1px solid #d8e7f7;
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .results h3 {
+      margin-top: 0;
+      margin-bottom: 14px;
+      color: var(--navy);
+      font-size: 1.05rem;
+    }
+
+    .result-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e7eef6;
+    }
+
+    .result-item strong { color: var(--navy); }
+
+    .formula {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.8);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 0.94rem;
+      line-height: 1.6;
+      border: 1px solid #e2ebf7;
+    }
+
+    .note {
+      margin-top: 14px;
+      font-size: 0.9rem;
+      color: #5d6b7a;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 820px) {
+      .content { grid-template-columns: 1fr; }
+      .hero { padding: 24px 20px 20px; }
+      .content { padding: 20px; }
+      .card { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <h1>Calculadora de Depreciación Profesional</h1>
+      <p>Evaluación ejecutiva del valor actual neto de un inmueble bajo el método Ross-Heidecke, con ajuste por grado de conservación según la tabla internacional.</p>
+    </section>
+
+    <section class="content">
+      <div class="card">
+        <h2>Datos del inmueble</h2>
+        <form id="depreciationForm" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <label for="vrn">Valor de Reproducción Nuevo (VRN)</label>
+              <input id="vrn" name="vrn" type="number" min="0.01" step="0.01" placeholder="Ej. 1250500" required />
+              <small>Ingrese un valor positivo en pesos.</small>
+            </div>
+
+            <div class="field">
+              <label for="edad">Edad actual del inmueble (e)</label>
+              <input id="edad" name="edad" type="number" min="0" step="1" placeholder="Ej. 12" required />
+              <small>En años; debe ser mayor o igual a 0.</small>
+            </div>
+
+            <div class="field">
+              <label for="vidaUtil">Vida útil total estimada (V)</label>
+              <input id="vidaUtil" name="vidaUtil" type="number" min="1" step="1" placeholder="Ej. 40" required />
+              <small>Debe ser estrictamente mayor que la edad actual.</small>
+            </div>
+
+            <div class="field">
+              <label for="conservacion">Estado de conservación</label>
+              <select id="conservacion" name="conservacion">
+                <option value="0">Grado 1 - Nuevo / Excelente estado</option>
+                <option value="0.03">Grado 2 - Regular / Conservación normal</option>
+                <option value="0.08">Grado 3 - Reparaciones sencillas / Mantenimiento menor</option>
+                <option value="0.18">Grado 4 - Reparaciones importantes / Desatendido</option>
+                <option value="0.5">Grado 5 - Demolición / Inservible</option>
+              </select>
+              <small>Seleccione el coeficiente de Heidecke que mejor represente el estado.</small>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="submit" class="btn-primary">Calcular</button>
+            <button type="button" id="resetBtn" class="btn-secondary">Limpiar</button>
+          </div>
+
+          <div id="errorMessage" class="error" role="alert"></div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Resultado de valoración</h2>
+        <div id="results" class="results">
+          <h3>Depreciación total estimada</h3>
+          <div class="result-grid">
+            <div class="result-item"><span>Factor Ross (R)</span><strong id="factorRoss">—</strong></div>
+            <div class="result-item"><span>Coeficiente Heidecke (p)</span><strong id="coefHeidecke">—</strong></div>
+            <div class="result-item"><span>Factor Total Ross-Heidecke (F_total)</span><strong id="factorTotal">—</strong></div>
+            <div class="result-item"><span>Depreciación acumulada</span><strong id="depreciacion">—</strong></div>
+            <div class="result-item"><span>Valor actual neto depreciado</span><strong id="valorActual">—</strong></div>
+          </div>
+
+          <div class="formula" id="formulaText"></div>
+          <p class="note">Todos los cálculos se ejecutan localmente en tu navegador sin depender de servicios externos.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById('depreciationForm');
+    const errorMessage = document.getElementById('errorMessage');
+    const results = document.getElementById('results');
+    const resetBtn = document.getElementById('resetBtn');
+
+    const currencyFormatter = new Intl.NumberFormat('es-MX', {
+      style: 'currency',
+      currency: 'MXN',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+
+    function formatDecimal(value) {
+      return Number(value).toFixed(4);
+    }
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.style.display = 'block';
+      results.style.display = 'none';
+    }
+
+    function clearError() {
+      errorMessage.textContent = '';
+      errorMessage.style.display = 'none';
+    }
+
+    function resetForm() {
+      form.reset();
+      clearError();
+      results.style.display = 'none';
+    }
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      clearError();
+
+      const vrn = Number(document.getElementById('vrn').value);
+      const edad = Number(document.getElementById('edad').value);
+      const vidaUtil = Number(document.getElementById('vidaUtil').value);
+      const p = Number(document.getElementById('conservacion').value);
+
+      if (!Number.isFinite(vrn) || vrn <= 0) {
+        showError('El Valor de Reproducción Nuevo debe ser mayor a 0.');
+        return;
+      }
+
+      if (!Number.isFinite(edad) || edad < 0) {
+        showError('La edad actual debe ser mayor o igual a 0.');
+        return;
+      }
+
+      if (!Number.isFinite(vidaUtil) || vidaUtil <= 0) {
+        showError('La vida útil total debe ser mayor a 0.');
+        return;
+      }
+
+      if (vidaUtil <= edad) {
+        showError('La vida útil total debe ser estrictamente mayor que la edad actual.');
+        return;
+      }
+
+      if (!Number.isFinite(p) || p < 0) {
+        showError('Seleccione un grado de conservación válido.');
+        return;
+      }
+
+      const R = 0.5 * ((edad / vidaUtil) + ((edad * edad) / (vidaUtil * vidaUtil)));
+      const F_total = R + (p * (1 - R));
+      const depreciacionAcumulada = vrn * F_total;
+      const valorActualNeto = vrn * (1 - F_total);
+
+      document.getElementById('factorRoss').textContent = formatDecimal(R);
+      document.getElementById('coefHeidecke').textContent = formatDecimal(p);
+      document.getElementById('factorTotal').textContent = formatDecimal(F_total);
+      document.getElementById('depreciacion').textContent = currencyFormatter.format(depreciacionAcumulada);
+      document.getElementById('valorActual').textContent = currencyFormatter.format(valorActualNeto);
+
+      document.getElementById('formulaText').innerHTML = `
+        <strong>Fórmula aplicada:</strong><br>
+        R = 0.5 × ((e / V) + (e² / V²)) = ${formatDecimal(R)}<br>
+        F_total = R + (p × (1 - R)) = ${formatDecimal(F_total)}<br>
+        Depreciación acumulada = VRN × F_total = ${currencyFormatter.format(depreciacionAcumulada)}<br>
+        Valor actual neto = VRN × (1 - F_total) = ${currencyFormatter.format(valorActualNeto)}
+      `;
+
+      results.style.display = 'block';
+    });
+
+    resetBtn.addEventListener('click', resetForm);
+  </script>
+</body>
+</html>
